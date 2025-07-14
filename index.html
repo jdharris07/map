@@ -60,9 +60,19 @@
       max-width: 500px;
       min-height: 60px;
     }
+    #map-container {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    #filter {
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: #00ff00;
+      text-align: center;
+    }
     #map {
       flex-grow: 1;
-      height: 100%;
     }
     .leaflet-container {
       background: black;
@@ -74,6 +84,10 @@
       height: 20px;
       border: 2px solid #00ff00;
       box-shadow: 0 0 15px #61bb40, 0 0 30px #61bb40;
+    }
+    label {
+      margin-right: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -87,13 +101,23 @@
       </div>
       <div id="service-desc"></div>
     </div>
-    <div id="map"></div>
+    <div id="map-container">
+      <div id="filter">
+        <label><input type="checkbox" value="Field Data Collection" checked> Field Data</label>
+        <label><input type="checkbox" value="Permitting" checked> Permitting</label>
+        <label><input type="checkbox" value="Pole Loading" checked> Pole Loading</label>
+        <label><input type="checkbox" value="Engineering Design" checked> Design</label>
+        <label><input type="checkbox" value="LiDAR" checked> LiDAR</label>
+        <label><input type="checkbox" value="Construction & Splicing" checked> Construction</label>
+        <button onclick="resetFilters()">Show All</button>
+      </div>
+      <div id="map"></div>
+    </div>
   </div>
 
   <script>
     const locations = [
-      // Offices
-      { city: "Tupelo, MS", lat: 34.2576, lon: -88.7034, text: "Tupelo, MS Home Office", isOffice: true },
+            { city: "Tupelo, MS", lat: 34.2576, lon: -88.7034, text: "Tupelo, MS Home Office", isOffice: true },
       { city: "Deerfield, MI", lat: 41.9634, lon: -83.7805, text: "Deerfield, MI Field Service Office", isOffice: true },
       { city: "Birmingham, AL", lat: 33.5207, lon: -86.8024, text: "Birmingham, AL Design Center", isOffice: true },
       { city: "Hyderabad, India", lat: 17.3850, lon: 78.4867, text: "Hyderabad, India Design Center", isOffice: true },
@@ -183,13 +207,12 @@
 { city: "Hawthorne, FL", lat: 29.6221, lon: -82.1880, text: "Hawthorne, FL: Engineering Design" },
 { city: "Monticello, IN", lat: 40.7448704, lon: -86.7618830, text: "Monticello, IN: Field Data Collection" },
 { city: "Columbia, SC", lat: 34.0007540, lon: -81.0352313, text: "Columbia, SC: Field Data Collection, Engineering Design" },
-
     ];
 
     const map = L.map('map', {
       zoomControl: false,
       attributionControl: false
-    }).setView([20, 0], 2); // Global view
+    }).setView([20, 0], 2);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
 
@@ -200,17 +223,44 @@
       popupAnchor: [0, -20]
     });
 
-    locations.forEach(loc => {
-      let marker;
-      if (loc.isOffice) {
-        marker = L.marker([loc.lat, loc.lon], { icon: officeIcon });
-      } else {
-        const divIcon = L.divIcon({ className: 'custom-marker' });
-        marker = L.marker([loc.lat, loc.lon], { icon: divIcon });
-      }
-      marker.addTo(map).bindPopup(loc.text);
+    let markers = [];
+
+    function addMarkers() {
+      clearMarkers();
+      const selected = Array.from(document.querySelectorAll('#filter input:checked')).map(cb => cb.value);
+      locations.forEach(loc => {
+        let match = loc.isOffice || selected.some(service => loc.text.includes(service));
+        if (match) {
+          let marker;
+          if (loc.isOffice) {
+            marker = L.marker([loc.lat, loc.lon], { icon: officeIcon });
+          } else {
+            const divIcon = L.divIcon({ className: 'custom-marker' });
+            marker = L.marker([loc.lat, loc.lon], { icon: divIcon });
+          }
+          marker.addTo(map).bindPopup(loc.text);
+          markers.push(marker);
+        }
+      });
+    }
+
+    function clearMarkers() {
+      markers.forEach(marker => map.removeLayer(marker));
+      markers = [];
+    }
+
+    document.querySelectorAll('#filter input').forEach(cb => {
+      cb.addEventListener('change', addMarkers);
     });
 
+    function resetFilters() {
+      document.querySelectorAll('#filter input').forEach(cb => cb.checked = true);
+      addMarkers();
+    }
+
+    addMarkers();
+
+    // Typewriter effect
     const statsLines = [
       "Hexad Solutions Group",
       "Year Founded: 2021",
@@ -242,6 +292,7 @@
     }
     typeLine();
 
+    // Chart
     const ctx = document.getElementById('workChart').getContext('2d');
     const serviceDesc = document.getElementById('service-desc');
     const serviceInfo = {
