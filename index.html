@@ -91,34 +91,106 @@
   </div>
 
   <script>
-    // Offices and project points
     const locations = [
-      { city: "Phoenix, AZ", lat: 33.4484, lon: -112.0740, text: "Phoenix, AZ: Field Data, LiDAR, permitting, design", isOffice: false },
-      { city: "Detroit, MI", lat: 42.3314, lon: -83.0458, text: "Detroit: Engineering & design", isOffice: false },
+      // Offices
       { city: "Tupelo, MS", lat: 34.2576, lon: -88.7034, text: "Tupelo, MS Home Office", isOffice: true },
       { city: "Deerfield, MI", lat: 41.9634, lon: -83.7805, text: "Deerfield, MI Field Service Office", isOffice: true },
-      { city: "Memphis, TN", lat: 35.1460, lon: -90.0517, text: "Memphis, TN: Field Data, LiDAR", isOffice: false },
-      { city: "Tulsa, OK", lat: 36.1563, lon: -95.9928, text: "Tulsa, OK: Permitting", isOffice: false },
-      { city: "Oklahoma City, OK", lat: 35.4730, lon: -97.5171, text: "Oklahoma City, OK: Permitting", isOffice: false },
-      { city: "Florence, AZ", lat: 33.0315, lon: -111.3873, text: "Florence, AZ: Permitting", isOffice: false },
       { city: "Birmingham, AL", lat: 33.5207, lon: -86.8024, text: "Birmingham, AL Design Center", isOffice: true },
-      { city: "Washougal, WA", lat: 45.5820, lon: -122.3480, text: "Washougal, WA: Field Data, Permitting, Design", isOffice: false },
-      { city: "Avon, OH", lat: 41.4517, lon: -82.0351, text: "Avon, OH: Field Data, Permitting, Design", isOffice: false },
-      { city: "Tampa, FL", lat: 27.9478, lon: -82.4584, text: "Tampa, FL: Field Data, LiDAR, Permitting, Design", isOffice: false },
-      { city: "Lorain, OH", lat: 41.2633554, lon: -82.1734746, text: "lorain, OH: Field Data, Permitting, Design" },
+      { city: "Hyderabad, India", lat: 17.3850, lon: 78.4867, text: "Hyderabad, India Design Center", isOffice: true },
+      { city: "Warangal, India", lat: 17.9784, lon: 79.6006, text: "Warangal, India Design Center", isOffice: true },
+
+      // US work points
+      { city: "Phoenix, AZ", lat: 33.4484, lon: -112.0740, text: "Phoenix, AZ: Field Data Collection, LiDAR, Permitting, Design" },
+      { city: "Florence, AZ", lat: 33.0315, lon: -111.3873, text: "Florence, AZ: Field Data Collection, LiDAR, Permitting, Design" },
+      { city: "Bellevue, WA", lat: 47.6101, lon: -122.2015, text: "Bellevue, WA: Field Data Collection, Permitting, Pole Loading" },
+      { city: "Tampa, FL", lat: 27.9478, lon: -82.4584, text: "Tampa, FL: LiDAR Collection, Engineering Design" },
+      { city: "Lake County, FL", lat: 28.8110, lon: -81.6530, text: "Lake County, FL: Permitting and Engineering Design" },
+      { city: "Tulsa, OK", lat: 36.1539, lon: -95.9928, text: "Tulsa, OK: Permitting" },
+      { city: "Oklahoma City, OK", lat: 35.4676, lon: -97.5164, text: "Oklahoma City, OK: Permitting" },
+
+      // Large list of WA, ID, OR, MT, CO points (with pole loading on some)
+      { city: "Acme, WA", lat: 48.6698, lon: -122.2777, text: "Acme, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Arlington, WA", lat: 48.1980, lon: -122.1251, text: "Arlington, WA: Field Data Collection & Permitting" },
+      { city: "Darrington, WA", lat: 48.2543, lon: -121.6043, text: "Darrington, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Big Lake, WA", lat: 48.4184, lon: -122.2610, text: "Big Lake, WA: Field Data Collection & Permitting" },
+      { city: "Colville, WA", lat: 48.5443, lon: -117.9054, text: "Colville, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Coupeville, WA", lat: 48.2193, lon: -122.6852, text: "Coupeville, WA: Field Data Collection & Permitting" },
+      { city: "Duvall, WA", lat: 47.7423, lon: -121.9854, text: "Duvall, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Ferndale, WA", lat: 48.8465, lon: -122.5910, text: "Ferndale, WA: Field Data Collection & Permitting" },
+      { city: "King County, WA", lat: 47.5480, lon: -121.9836, text: "King County, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "La Grande, WA", lat: 46.7593, lon: -122.2173, text: "La Grande, WA: Field Data Collection & Permitting" },
+      { city: "Lynden, WA", lat: 48.9462, lon: -122.4527, text: "Lynden, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Monroe, WA", lat: 47.8554, lon: -121.9700, text: "Monroe, WA: Field Data Collection & Permitting" },
+      { city: "Mukilteo, WA", lat: 47.9445, lon: -122.3046, text: "Mukilteo, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Oak Harbor, WA", lat: 48.2932, lon: -122.6432, text: "Oak Harbor, WA: Field Data Collection & Permitting" },
+      { city: "Pullman, WA", lat: 46.7313, lon: -117.1796, text: "Pullman, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Redmond, WA", lat: 47.673988, lon: -122.121513, text: "Redmond, WA: Field Data Collection & Permitting" },
+      { city: "Richland, WA", lat: 46.2857, lon: -119.2845, text: "Richland, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Sand Point, WA", lat: 47.6826, lon: -122.2632, text: "Sand Point, WA: Field Data Collection & Permitting" },
+      { city: "Stanwood, WA", lat: 48.2412, lon: -122.3707, text: "Stanwood, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Sunnyside, WA", lat: 46.3235, lon: -120.0084, text: "Sunnyside, WA: Field Data Collection & Permitting" },
+      { city: "Vancouver, WA", lat: 45.6387, lon: -122.6615, text: "Vancouver, WA: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Lummi, WA", lat: 48.7163, lon: -122.6274, text: "Lummi, WA: Field Data Collection & Permitting" },
+      { city: "Bonners Ferry, ID", lat: 48.6916, lon: -116.3163, text: "Bonners Ferry, ID: Field Data Collection & Permitting" },
+      { city: "Kellogg, ID", lat: 47.5380, lon: -115.9645, text: "Kellogg, ID: Field Data Collection & Permitting" },
+      { city: "New Meadows, ID", lat: 45.1435, lon: -116.2896, text: "New Meadows, ID: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Cave Junction, OR", lat: 42.1676, lon: -123.6489, text: "Cave Junction, OR: Field Data Collection & Permitting" },
+      { city: "Enterprise, OR", lat: 45.4265, lon: -117.2787, text: "Enterprise, OR: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Hermiston, OR", lat: 45.8400, lon: -119.2910, text: "Hermiston, OR: Field Data Collection & Permitting" },
+      { city: "Keizer, OR", lat: 44.9901, lon: -123.0262, text: "Keizer, OR: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Provolt, OR", lat: 42.3760, lon: -123.3123, text: "Provolt, OR: Field Data Collection & Permitting" },
+      { city: "Salem, OR", lat: 44.9429, lon: -123.0351, text: "Salem, OR: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Wallowa, OR", lat: 45.5704, lon: -117.5334, text: "Wallowa, OR: Field Data Collection & Permitting" },
+      { city: "Libby, MT", lat: 48.3888, lon: -115.5568, text: "Libby, MT: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Butte, MT", lat: 46.0038, lon: -112.5347, text: "Butte, MT: Field Data Collection & Permitting" },
+      { city: "Eagle, CO", lat: 39.6553, lon: -106.8286, text: "Eagle, CO: Field Data Collection & Permitting, Pole Loading" },
+      { city: "Hattiesburg, MS", lat: 31.3271189, lon: -89.2903392, text: "Hattiesburg, MS: Field Data Collection" },
+      { city: "Oxford, MS", lat: 34.3663773, lon: -89.5187664, text: "Oxford, MS: Construction & Splicing" },
+      { city: "Southhaven, MS", lat: 34.9917606, lon: -90.1275934, text: "Southhaven, MS: Construction & Splicing" },
+      { city: "Pontotoc, MS", lat: 34.2114655, lon: -89.0382651, text: "Pontotoc, MS: Construction & Splicing" },
+      { city: "Mineral Springs, AR", lat: 33.8767283, lon: -93.9164267, text: "Mineral Springs, AR: Field Data Collection, Pole Loading" },
+{ city: "Flemingsburg, KY", lat: 38.4514, lon: -83.7010, text: "Flemingsburg, KY: Engineering Design" },
+{ city: "Fairplay, KY", lat: 38.0781, lon: -84.3657, text: "Fairplay, KY: Engineering Design" },
+{ city: "Ottumwa, IA", lat: 41.0233, lon: -92.4170, text: "Ottumwa, IA: Engineering Design" },
+{ city: "Agency, IA", lat: 40.9767, lon: -92.1477, text: "Agency, IA: Engineering Design" },
+{ city: "Ewing, KY", lat: 38.2134, lon: -83.2229, text: "Ewing, KY: Engineering Design" },
+{ city: "Loretto, KY", lat: 37.5573, lon: -85.6477, text: "Loretto, KY: Engineering Design" },
+{ city: "New Haven, KY", lat: 38.1590, lon: -85.9615, text: "New Haven, KY: Engineering Design" },
+{ city: "Lebanon, KY", lat: 37.5701, lon: -85.2534, text: "Lebanon, KY: Engineering Design" },
+{ city: "Milburn, KY", lat: 37.0626, lon: -83.7165, text: "Milburn, KY: Engineering Design" },
+{ city: "Paint Lick, KY", lat: 37.6818, lon: -84.2022, text: "Paint Lick, KY: Engineering Design" },
+{ city: "Lancaster, KY", lat: 37.5660, lon: -84.2939, text: "Lancaster, KY: Engineering Design" },
+{ city: "Brodhead, KY", lat: 37.5259, lon: -84.0968, text: "Brodhead, KY: Engineering Design" },
+{ city: "Wilcox, PA", lat: 41.6401, lon: -77.6876, text: "Wilcox, PA: Engineering Design" },
+{ city: "North Ridgeville, OH", lat: 41.3995, lon: -82.0073, text: "North Ridgeville, OH: Engineering Design" },
+{ city: "Concord, NC", lat: 35.4088, lon: -80.5795, text: "Concord, NC: Engineering Design" },
+{ city: "Mount Ida, AR", lat: 34.5645, lon: -93.3803, text: "Mount Ida, AR: Engineering Design" },
+{ city: "Holly Springs, GA", lat: 33.9340, lon: -84.5486, text: "Holly Springs, GA: Engineering Design" },
+{ city: "Fulton, KY", lat: 36.5120, lon: -88.8974, text: "Fulton, KY: Engineering Design" },
+{ city: "Newton, GA", lat: 32.5540, lon: -84.2528, text: "Newton, GA: Engineering Design" },
+{ city: "Pangburn, AR", lat: 35.5079, lon: -91.9523, text: "Pangburn, AR: Engineering Design" },
+{ city: "Pine Bluff, AR", lat: 34.2284, lon: -92.0032, text: "Pine Bluff, AR: Engineering Design" },
+{ city: "Sugar Land, TX", lat: 29.6197, lon: -95.6349, text: "Sugar Land, TX: Engineering Design" },
+{ city: "Newberry, FL", lat: 29.2947, lon: -82.6151, text: "Newberry, FL: Engineering Design" },
+{ city: "Chiefland, FL", lat: 29.4843, lon: -82.8594, text: "Chiefland, FL: Engineering Design" },
+{ city: "Bronson, FL", lat: 29.6455, lon: -82.9003, text: "Bronson, FL: Engineering Design" },
+{ city: "Abbeville, GA", lat: 32.9513, lon: -83.2998, text: "Abbeville, GA: Engineering Design" },
+{ city: "Winfield, IA", lat: 40.7981, lon: -95.1127, text: "Winfield, IA: Engineering Design" },
+{ city: "Milledgeville, GA", lat: 33.0805, lon: -83.2320, text: "Milledgeville, GA: Engineering Design" },
+{ city: "Melrose, FL", lat: 29.9260, lon: -81.9040, text: "Melrose, FL: Engineering Design" },
+{ city: "Waldo, FL", lat: 29.8909, lon: -82.1664, text: "Waldo, FL: Engineering Design" },
+{ city: "Armstrong, IA", lat: 42.8233, lon: -95.0501, text: "Armstrong, IA: Engineering Design" },
+{ city: "Hawthorne, FL", lat: 29.6221, lon: -82.1880, text: "Hawthorne, FL: Engineering Design" },
+
     ];
 
-    // Initialize Leaflet map
     const map = L.map('map', {
       zoomControl: false,
       attributionControl: false
-    }).setView([39.5, -98.35], 4);
+    }).setView([20, 0], 2); // Global view
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-      maxZoom: 18
-    }).addTo(map);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18 }).addTo(map);
 
-    // Office icon
     const officeIcon = L.icon({
       iconUrl: 'hexad.png',
       iconSize: [20, 20],
@@ -126,7 +198,6 @@
       popupAnchor: [0, -20]
     });
 
-    // Add points
     locations.forEach(loc => {
       let marker;
       if (loc.isOffice) {
@@ -138,15 +209,13 @@
       marker.addTo(map).bindPopup(loc.text);
     });
 
-    // Typewriter effect
     const statsLines = [
       "Hexad Solutions Group",
       "Year Founded: 2021",
       "Total Employees: 255"
     ];
     const statsText = document.getElementById('stats-text');
-    let lineIndex = 0;
-    let charIndex = 0;
+    let lineIndex = 0, charIndex = 0;
 
     function typeLine() {
       if (lineIndex < statsLines.length) {
@@ -171,7 +240,6 @@
     }
     typeLine();
 
-    // Chart
     const ctx = document.getElementById('workChart').getContext('2d');
     const serviceDesc = document.getElementById('service-desc');
     const serviceInfo = {
@@ -198,41 +266,32 @@
         }]
       },
       options: {
-        animation: {
-          duration: 1000,
-          easing: 'easeOutQuart'
-        },
+        animation: { duration: 1000, easing: 'easeOutQuart' },
         plugins: {
           legend: {
             position: 'right',
             labels: {
               color: '#00ff00',
-              font: {
-                family: 'HK Modular',
-                size: 22
-              }
+              font: { family: 'HK Modular', size: 22 }
             }
           }
         }
       }
     });
 
-    // Sequentially add slices
     let currentIndex = 0;
 
     function addNextSlice() {
       if (currentIndex < dataValues.length) {
         workChart.data.datasets[0].data[currentIndex] = dataValues[currentIndex];
         workChart.update();
-        const label = labels[currentIndex];
-        serviceDesc.textContent = serviceInfo[label];
+        serviceDesc.textContent = serviceInfo[labels[currentIndex]];
         currentIndex++;
         setTimeout(addNextSlice, 2000);
       } else {
         serviceDesc.textContent = "Click a section to see details again!";
       }
     }
-
     setTimeout(addNextSlice, 1000);
   </script>
 </body>
