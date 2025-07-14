@@ -58,6 +58,7 @@
       font-size: 1.4em;
       color: #00ff00;
       max-width: 500px;
+      min-height: 60px;
     }
     #map {
       flex-grow: 1;
@@ -97,15 +98,16 @@
       { city: "Tupelo, MS", lat: 34.2576, lon: -88.7034, text: "Tupelo, MS Home Office", isOffice: true },
       { city: "Deerfield, MI", lat: 41.9634, lon: -83.7805, text: "Deerfield, MI Field Service Office", isOffice: true },
       { city: "Memphis, TN", lat: 35.1460, lon: -90.0517, text: "Memphis, TN: Field Data, LiDAR", isOffice: false },
-      { city: "Tulsa, OK", lat: 36.1563122, lon: -95.9927516, text: "Tulsa, OK: Permitting" },
-      { city: "Oklahoma City, OK", lat: 35.4729886, lon: -97.5170536, text: "Oklahoma City, OK: Permitting" },    
-      { city: "Florence, AZ", lat: 33.0314508, lon: -111.3873430, text: "Florence, AZ: Permitting" },
-      { city: "Birmingham, AL", lat: 33.5206824, lon: -86.8024326, text: "Birmingham, AL Design Center", isOffice: true },
-      { city: "Washougal, WA", lat: 45.5819594, lon: -122.3479921, text: "Washougal, WA: Field Data, Permitting, Design" },
-      { city: "Avon, OH", lat: 41.4516512, lon: -82.0350598, text: "Avon, OH: Field Data, Permitting, Design" },
-      { city: "Tampa, FL", lat: 27.9477595, lon: -82.4584440, text: "Tampa, FL: Field Data, LiDAR, Permitting, Design" },
-      { city: "Lorain, OH", lat: 41.2633554, lon: -82.1734746, text: "Lorain, OH: Field Data, Permitting, Design" },
-];
+      { city: "Tulsa, OK", lat: 36.1563, lon: -95.9928, text: "Tulsa, OK: Permitting", isOffice: false },
+      { city: "Oklahoma City, OK", lat: 35.4730, lon: -97.5171, text: "Oklahoma City, OK: Permitting", isOffice: false },
+      { city: "Florence, AZ", lat: 33.0315, lon: -111.3873, text: "Florence, AZ: Permitting", isOffice: false },
+      { city: "Birmingham, AL", lat: 33.5207, lon: -86.8024, text: "Birmingham, AL Design Center", isOffice: true },
+      { city: "Washougal, WA", lat: 45.5820, lon: -122.3480, text: "Washougal, WA: Field Data, Permitting, Design", isOffice: false },
+      { city: "Avon, OH", lat: 41.4517, lon: -82.0351, text: "Avon, OH: Field Data, Permitting, Design", isOffice: false },
+      { city: "Tampa, FL", lat: 27.9478, lon: -82.4584, text: "Tampa, FL: Field Data, LiDAR, Permitting, Design", isOffice: false },
+      { city: "Lorain, OH", lat: 41.2634, lon: -82.1735, text: "Lorain, OH: Field Data, Permitting, Design", isOffice: false },
+    ];
+
     // Initialize Leaflet map
     const map = L.map('map', {
       zoomControl: false,
@@ -119,8 +121,8 @@
     // Office icon
     const officeIcon = L.icon({
       iconUrl: 'hexad.png',
-      iconSize: [20, 20], // adjust as needed
-      iconAnchor: [20, 20], // center the icon
+      iconSize: [20, 20],
+      iconAnchor: [10, 10],
       popupAnchor: [0, -20]
     });
 
@@ -178,23 +180,27 @@
       "Network Design": "Network Design: FTTx Planning, Permitting, Make-Ready Engineering",
       "Field Services": "Field Services: Pole Audits, Site Surveys, Field Data Collection"
     };
+
+    const labels = ['Construction', 'LiDAR & Mapping', 'Network Design', 'Field Services'];
+    const dataValues = [20, 15, 40, 25];
+    const colors = ['#00ff00', '#61bb40', '#008000', '#00cc66'];
+
+    const initialData = [0, 0, 0, 0];
+
     const workChart = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: ['Construction', 'LiDAR & Mapping', 'Network Design', 'Field Services'],
+        labels: labels,
         datasets: [{
-          data: [20, 15, 40, 25],
-          backgroundColor: ['#00ff00', '#61bb40', '#008000', '#00cc66'],
+          data: initialData,
+          backgroundColor: colors,
           borderColor: '#000',
         }]
       },
       options: {
-        onClick: (evt, elements) => {
-          if (elements.length > 0) {
-            const index = elements[0].index;
-            const label = workChart.data.labels[index];
-            serviceDesc.textContent = serviceInfo[label];
-          }
+        animation: {
+          duration: 1000,
+          easing: 'easeOutQuart'
         },
         plugins: {
           legend: {
@@ -210,6 +216,24 @@
         }
       }
     });
+
+    // Sequentially add slices
+    let currentIndex = 0;
+
+    function addNextSlice() {
+      if (currentIndex < dataValues.length) {
+        workChart.data.datasets[0].data[currentIndex] = dataValues[currentIndex];
+        workChart.update();
+        const label = labels[currentIndex];
+        serviceDesc.textContent = serviceInfo[label];
+        currentIndex++;
+        setTimeout(addNextSlice, 2000);
+      } else {
+        serviceDesc.textContent = "Click a section to see details again!";
+      }
+    }
+
+    setTimeout(addNextSlice, 1000);
   </script>
 </body>
 </html>
