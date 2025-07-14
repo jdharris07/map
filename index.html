@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hexad Mission Control</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @font-face {
+      font-family: 'HK Modular';
+      src: url('HKModular.ttf') format('truetype');
+    }
+
+    body {
+      margin: 0;
+      background-color: #000;
+      color: #00ff00;
+      font-family: 'HK Modular', monospace;
+      overflow: hidden;
+      display: flex;
+      height: 100vh;
+    }
+
+    #main-container {
+      flex: 1;
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    #stats-container {
+      position: relative;
+      width: 600px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #stats-container img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #stats-text {
+      position: absolute;
+      top: 50px;
+      left: 100px;
+      right: 100px;
+      font-size: 2em;
+      line-height: 2.2;
+      white-space: pre-line;
+      text-align: left;
+    }
+
+    #chart-container {
+      width: 90%;
+      margin-top: 20px;
+    }
+
+    #service-desc {
+      margin-top: 5px;
+      text-align: center;
+      font-size: 1.4em;
+      color: #00ff00;
+      max-width: 500px;
+    }
+
+    #map-container {
+      flex-grow: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    #map-wrapper {
+      position: relative;
+      width: 90%;
+    }
+
+    #us-outline {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .point, .office-icon {
+      position: absolute;
+      width: 1.5%;
+      aspect-ratio: 1/1;
+      border-radius: 50%;
+      background: #61bb40;
+      animation: pulse 2s infinite;
+      cursor: pointer;
+    }
+
+    .office-icon {
+      border-radius: 0;
+      background: none;
+      width: 2.5%;
+      aspect-ratio: auto;
+      animation: none;
+    }
+
+    .office-icon img {
+      width: 100%;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 5px #61bb40, 0 0 10px #61bb40; }
+      50% { box-shadow: 0 0 15px #61bb40, 0 0 30px #61bb40; }
+    }
+
+    .speech-bubble {
+      position: absolute;
+      background: rgba(0,0,0,0.85);
+      padding: 15px;
+      border: 1px solid #00ff00;
+      border-radius: 5px;
+      color: #00ff00;
+      font-size: 1.5em;
+      max-width: 360px;
+      z-index: 10;
+    }
+
+    svg.connector-svg {
+      position: absolute;
+      overflow: visible;
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    line.connector-line {
+      stroke: #00ff00;
+      stroke-width: 2;
+    }
+  </style>
+</head>
+<body>
+  <div id="main-container">
+    <!-- Stats block -->
+    <div id="stats-container">
+      <img src="statblock.png" alt="Stat Block">
+      <div id="stats-text"></div>
+      <div id="chart-container">
+        <canvas id="workChart"></canvas>
+      </div>
+      <div id="service-desc"></div>
+    </div>
+
+    <!-- Map container -->
+    <div id="map-container">
+      <div id="map-wrapper">
+        <img id="us-outline" src="outline.png" alt="US Outline">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const projectPoints = [
+      { city: "Phoenix, AZ", x: 30, y: 62, text: "Phoenix, AZ: Field Data, LiDAR, permitting, design", isOffice: false },
+      { city: "Detroit, MI", x: 65, y: 28, text: "Detroit: Engineering & design", isOffice: false },
+    ];
+    const officePoints = [
+      { city: "Tupelo, MS", x: 58.5, y: 59, text: "Tupelo, MS Home Office", isOffice: true },
+      { city: "Deerfield, MI", x: 63, y: 30, text: "Deerfield, MI Field Service Office", isOffice: true }
+    ];
+
+    const wrapper = document.getElementById('map-wrapper');
+    let activeBubble = null;
+    let activeLine = null;
+
+    function createPoint(pt) {
+      let el;
+      if (pt.isOffice) {
+        el = document.createElement("div");
+        el.className = "office-icon";
+        const img = document.createElement("img");
+        img.src = "hexad.png";
+        el.appendChild(img);
+      } else {
+        el = document.createElement("div");
+        el.className = "point";
+      }
+      el.style.left = pt.x + "%";
+      el.style.top = pt.y + "%";
+
+      el.addEventListener("click", (e) => {
+        e.stopPropagation();
+        showBubble(pt, el);
+      });
+      wrapper.appendChild(el);
+    }
+
+    projectPoints.concat(officePoints).forEach(createPoint);
+
+    function showBubble(pt, el) {
+      if (activeBubble) activeBubble.remove();
+      if (activeLine) activeLine.remove();
+
+      const bubble = document.createElement("div");
+      bubble.className = "speech-bubble";
+      bubble.textContent = pt.text;
+      wrapper.appendChild(bubble);
+
+      const rect = el.getBoundingClientRect();
+      const wrapperRect = wrapper.getBoundingClientRect();
+
+      const pointX = rect.left + rect.width / 2 - wrapperRect.left;
+      const pointY = rect.top + rect.height / 2 - wrapperRect.top;
+
+      const bubbleX = pointX + 80;
+      const bubbleY = pointY - 40;
+
+      bubble.style.left = `${bubbleX}px`;
+      bubble.style.top = `${bubbleY}px`;
+
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.classList.add("connector-svg");
+      svg.style.left = "0";
+      svg.style.top = "0";
+      svg.style.width = "100%";
+      svg.style.height = "100%";
+
+      const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+      line.classList.add("connector-line");
+      line.setAttribute("x1", pointX);
+      line.setAttribute("y1", pointY);
+      line.setAttribute("x2", bubbleX);
+      line.setAttribute("y2", bubbleY);
+      svg.appendChild(line);
+
+      wrapper.appendChild(svg);
+
+      activeBubble = bubble;
+      activeLine = svg;
+
+      document.addEventListener("click", clearBubbleOnce, { once: true });
+    }
+
+    function clearBubbleOnce() {
+      if (activeBubble) activeBubble.remove();
+      if (activeLine) activeLine.remove();
+      activeBubble = null;
+      activeLine = null;
+    }
+
+    // Typewriter effect with loop
+    const statsLines = [
+      "Hexad Solutions Group",
+      "Year Founded: 2021",
+      "Total Employees: 255"
+    ];
+    const statsText = document.getElementById('stats-text');
+    let lineIndex = 0;
+    let charIndex = 0;
+
+    function typeLine() {
+      if (lineIndex < statsLines.length) {
+        if (charIndex < statsLines[lineIndex].length) {
+          statsText.textContent += statsLines[lineIndex].charAt(charIndex);
+          charIndex++;
+          setTimeout(typeLine, 50);
+        } else {
+          statsText.textContent += "\n";
+          lineIndex++;
+          charIndex = 0;
+          setTimeout(typeLine, 400);
+        }
+      } else {
+        setTimeout(() => {
+          statsText.textContent = "";
+          lineIndex = 0;
+          charIndex = 0;
+          setTimeout(typeLine, 500);
+        }, 3000);
+      }
+    }
+    typeLine();
+
+    // Chart.js pie chart
+    const ctx = document.getElementById('workChart').getContext('2d');
+    const serviceDesc = document.getElementById('service-desc');
+
+    const serviceInfo = {
+      "Construction": "Construction: Aerial & Sub Surface Placement, Fiber & COAX splicing",
+      "LiDAR & Mapping": "LiDAR & Mapping: Survey-grade LiDAR, Photogrammetry, GIS Mapping",
+      "Network Design": "Network Design: FTTx Planning, Permitting, Make-Ready Engineering",
+      "Field Services": "Field Services: Pole Audits, Site Surveys, Field Data Collection"
+    };
+
+    const workChart = new Chart(ctx, {
+      type: 'pie',
+      data: {
+        labels: ['Construction', 'LiDAR & Mapping', 'Network Design', 'Field Services'],
+        datasets: [{
+          data: [20, 15, 40, 25],
+          backgroundColor: ['#00ff00', '#61bb40', '#008000', '#00cc66'],
+          borderColor: '#000',
+        }]
+      },
+      options: {
+        onClick: (evt, elements) => {
+          if (elements.length > 0) {
+            const index = elements[0].index;
+            const label = workChart.data.labels[index];
+            serviceDesc.textContent = serviceInfo[label];
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: {
+              color: '#00ff00',
+              font: {
+                family: 'HK Modular',
+                size: 22
+              }
+            }
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
