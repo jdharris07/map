@@ -92,28 +92,48 @@
   <script>
     // Offices and project points
     const locations = [
-      { city: "Phoenix, AZ", lat: 33.4484, lon: -112.0740, text: "Phoenix, AZ: Field Data, LiDAR, permitting, design" },
-      { city: "Detroit, MI", lat: 42.3314, lon: -83.0458, text: "Detroit: Engineering & design" },
-      { city: "Tupelo, MS", lat: 34.2576, lon: -88.7034, text: "Tupelo, MS Home Office" },
-      { city: "Deerfield, MI", lat: 41.9634, lon: -83.7805, text: "Deerfield, MI Field Service Office" }
-    ];
-
+      { city: "Phoenix, AZ", lat: 33.4484, lon: -112.0740, text: "Phoenix, AZ: Field Data, LiDAR, permitting, design", isOffice: false },
+      { city: "Detroit, MI", lat: 42.3314, lon: -83.0458, text: "Detroit: Engineering & design", isOffice: false },
+      { city: "Tupelo, MS", lat: 34.2576, lon: -88.7034, text: "Tupelo, MS Home Office", isOffice: true },
+      { city: "Deerfield, MI", lat: 41.9634, lon: -83.7805, text: "Deerfield, MI Field Service Office", isOffice: true },
+      { city: "Memphis, TN", lat: 35.1460, lon: -90.0517, text: "Memphis, TN: Field Data, LiDAR", isOffice: false },
+      { city: "Tulsa, OK", lat: 36.1563122, lon: -95.9927516, text: "Tulsa, OK: Permitting" },
+      { city: "Oklahoma City, OK", lat: 35.4729886, lon: -97.5170536, text: "Oklahoma City, OK: Permitting" },    
+      { city: "Florence, AZ", lat: 33.0314508, lon: -111.3873430, text: "Florence, AZ: Permitting" },
+      { city: "Birmingham, AL", lat: 33.5206824, lon: -86.8024326, text: "Birmingham, AL Design Center", isOffice: true },
+      { city: "Washougal, WA", lat: 45.5819594, lon: -122.3479921, text: "Washougal, WA: Field Data, Permitting, Design" },
+      { city: "Avon, OH", lat: 41.4516512, lon: -82.0350598, text: "Avon, OH: Field Data, Permitting, Design" },
+      { city: "Tampa, FL", lat: 27.9477595, lon: -82.4584440, text: "Tampa, FL: Field Data, LiDAR, Permitting, Design" },
+      { city: "Lorain, OH", lat: 41.2633554, lon: -82.1734746, text: "Lorain, OH: Field Data, Permitting, Design" },
+];
     // Initialize Leaflet map
     const map = L.map('map', {
       zoomControl: false,
       attributionControl: false
-    }).setView([39.5, -98.35], 4); // Center on USA
+    }).setView([39.5, -98.35], 4);
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
       maxZoom: 18
     }).addTo(map);
 
+    // Office icon
+    const officeIcon = L.icon({
+      iconUrl: 'hexad.png',
+      iconSize: [20, 20], // adjust as needed
+      iconAnchor: [20, 20], // center the icon
+      popupAnchor: [0, -20]
+    });
+
     // Add points
     locations.forEach(loc => {
-      const marker = L.divIcon({ className: 'custom-marker' });
-      L.marker([loc.lat, loc.lon], { icon: marker })
-        .addTo(map)
-        .bindPopup(loc.text);
+      let marker;
+      if (loc.isOffice) {
+        marker = L.marker([loc.lat, loc.lon], { icon: officeIcon });
+      } else {
+        const divIcon = L.divIcon({ className: 'custom-marker' });
+        marker = L.marker([loc.lat, loc.lon], { icon: divIcon });
+      }
+      marker.addTo(map).bindPopup(loc.text);
     });
 
     // Typewriter effect
